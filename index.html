@@ -7,7 +7,106 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 </head>
 <body>
-  <svg></svg>
-  <script src="index.js"></script>
+<h1>Emerging UX Trends by STEEP Category and Strength</h1>
+<div class="legend" id="legend"></div>
+<div id="tooltip" class="tooltip" style="opacity:0;"></div>
+<svg></svg>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+  const data = [ 
+    { category: "Social", theme: "Diverse User Needs", strength: 3 },
+    { category: "Social", theme: "Accessibility & Usability", strength: 4 },
+    { category: "Social", theme: "Emotional & Behavioral Cues", strength: 2 },
+    { category: "Social", theme: "Rising scrutiny of dark UX", strength: 3 },
+    { category: "Social", theme: "Context-Aware Personalization", strength: 4 },
+    { category: "Technological", theme: "Emotionally Intelligent AI Interfaces", strength: 5 },
+    { category: "Technological", theme: "Ethics & Human-Centered AI", strength: 4 },
+    { category: "Technological", theme: "Sensory & Contextual Recognition", strength: 3 },
+    { category: "Technological", theme: "Adaptive, Inclusive UX Systems", strength: 4 },
+    { category: "Economic", theme: "Reframing UX ROI Beyond Money", strength: 2 },
+    { category: "Environmental", theme: "Trust Badges", strength: 3 },
+    { category: "Environmental", theme: "Green Nudges", strength: 3 },
+    { category: "Political", theme: "Regulated UX", strength: 4 },
+    { category: "Technological", theme: "Shifting to ethical, responsive design systems", strength: 5 }
+  ];
+
+  const width = 800;
+
+  const color = d3.scaleOrdinal(d3.schemeSet2);
+  const categories = Array.from(new Set(data.map(d => d.category)));
+  const legend = d3.select("#legend");
+  categories.forEach(cat => {
+    legend.append("div")
+      .attr("class", "legend-item")
+      .html(`<div class='legend-color' style='background:${color(cat)}'></div>${cat}`);
+  });
+
+  const root = d3.pack()
+    .size([width, 1000])
+    .padding(5)(
+      d3.hierarchy({ children: data })
+        .sum(d => d.strength)
+  );
+
+  // Adjust SVG height based on node layout
+  const maxY = d3.max(root.leaves(), d => d.y + d.r);
+  const height = maxY + 20;
+  const svg = d3.select("svg")
+    .attr("viewBox", [0, 0, width, height]);
+
+  const tooltip = d3.select("#tooltip");
+
+  const node = svg.selectAll("g")
+    .data(root.leaves())
+    .enter().append("g")
+    .attr("transform", d => `translate(${d.x},${d.y})`)
+    .on("mouseover", function(event, d) {
+      tooltip.style("opacity", 1)
+             .html(`<strong>${d.data.category}</strong><br>${d.data.theme}<br>Strength: ${d.data.strength}`)
+             .style("left", (event.pageX + 10) + "px")
+             .style("top", (event.pageY - 10) + "px");
+      d3.select(this).select("circle")
+        .transition().duration(200)
+        .attr("r", d.r * 1.15);
+    })
+    .on("mouseout", function(event, d) {
+      tooltip.style("opacity", 0);
+      d3.select(this).select("circle")
+        .transition().duration(200)
+        .attr("r", d.r);
+    });
+
+  node.append("circle")
+    .attr("r", d => d.r)
+    .attr("fill", d => color(d.data.category));
+
+  const textGroups = node.append("text")
+    .attr("class", "bubble")
+    .attr("text-anchor", "middle")
+    .style("font-size", d => `${Math.min(12, d.r / 3)}px`);
+
+  textGroups.selectAll("tspan")
+    .data(d => {
+      const words = d.data.theme.split(" ");
+      const lines = [];
+      let line = words[0];
+      for (let i = 1; i < words.length; i++) {
+        const estWidth = (line + " " + words[i]).length * (d.r / 10);
+        if (estWidth < d.r * 1.8) {
+          line += " " + words[i];
+        } else {
+          lines.push(line);
+          line = words[i];
+        }
+      }
+      lines.push(line);
+      return lines.map((line, i, arr) => ({ text: line, offset: (i - (arr.length - 1) / 2) * 12 }));
+    })
+    .enter().append("tspan")
+    .text(d => d.text)
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("dy", d => `${d.offset}px`);
+</script>
 </body>
 </html>
