@@ -1,4 +1,4 @@
-const uxThemes = [
+export const uxThemes = [
   { category: "Social", theme: "Diverse User Needs", keyword: "inclusive ux", strength: 2 },
   { category: "Social", theme: "Accessibility & Usability", keyword: "inclusive ux", strength: 1 },
   { category: "Social", theme: "Emotional/Behavioral Cues", keyword: "microinteraction", strength: 2 },
@@ -12,5 +12,5 @@ const uxThemes = [
   { category: "Environmental", theme: "Trust Badges", keyword: "Sustainable UX", strength: 2 },
   { category: "Environmental", theme: "Green Nudges", keyword: "Sustainable UX", strength: 2 },
   { category: "Political", theme: "Regulated UX", keyword: "GDPR", strength: 2 },
-  { category: "Technological", theme: "Design systems are shifting  to responsive, ethical, context-aware aesthetics", keyword: "Design Systems", strength: 3 },
+  { category: "Technological", theme: "Design systems are shifting from static visuals to responsive, ethical, context-aware aesthetics", keyword: "Design Systems", strength: 3 }
 ];
